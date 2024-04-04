@@ -18,6 +18,7 @@ k3d image import --cluster=spring --verbose spring-http2-test
 ## Test
 
 ```bash
+kubectl run --namespace kuma-demo mycurlpod --image=nicolaka/netshoot -i --tty -- sh
 while true; do
   curl -v http://my-app-service-spring.kuma-demo.svc.8080.mesh:80 && curl -v http://my-app-service-spring.kuma-demo.svc.8080.mesh:80
   if [[ "$?" -ne 0 ]]; then
