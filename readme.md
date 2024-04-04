@@ -12,7 +12,7 @@
 docker build -t spring-http2-test:1.0.0 .
 k3d cluster create spring
 kumactl install control-plane | kubectl apply -f - # kong-mesh 2.4.2
-k3d image import --cluster=spring --verbose spring-http2-test
+k3d image import --cluster=spring --verbose spring-http2-test:1.0.0
 kubectl apply -f k8s/spring-app.yaml
 ```
 
