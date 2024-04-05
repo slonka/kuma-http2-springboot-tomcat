@@ -9,10 +9,10 @@
 
 ```bash
 ./gradlew war assemble
-docker build -t spring-http2-test:1.0.0 .
+docker build -t spring-http2-test:1.0.1 .
 k3d cluster create spring
 kumactl install control-plane | kubectl apply -f - # kong-mesh 2.4.2
-k3d image import --cluster=spring --verbose spring-http2-test:1.0.0
+k3d image import --cluster=spring --verbose spring-http2-test:1.0.1
 kubectl apply -f k8s/spring-app.yaml
 ```
 
@@ -21,7 +21,7 @@ kubectl apply -f k8s/spring-app.yaml
 ```bash
 kubectl run --namespace kuma-demo mycurlpod --image=nicolaka/netshoot -i --tty -- sh
 while true; do
-  curl -v http://my-app-service-spring.kuma-demo.svc.8080.mesh:80 && curl -v http://my-app-service-spring.kuma-demo.svc.8080.mesh:80
+  curl -v --http2 http://my-app-service-spring.kuma-demo.svc.8080.mesh:80 && curl -v --http2 http://my-app-service-spring.kuma-demo.svc.8080.mesh:80
   if [[ "$?" -ne 0 ]]; then
     break
   fi
