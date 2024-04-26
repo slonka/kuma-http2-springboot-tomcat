@@ -1,0 +1,81 @@
+api:
+  main-event-name: api-v1-$${api.domain}-$${api.app-name}
+
+encryption:
+  status: false
+
+debug: false
+
+logging:
+  level:
+    root: INFO
+    org:
+      apache:
+        tomcat: DEBUG
+        catalina: DEBUG
+  config: classpath:logback-spring.xml
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-components: always
+      show-details: always
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include:
+          - health
+          - info
+          - metrics
+          - purgecache
+          - prometheus
+  health:
+    livenessstate:
+      enabled: true
+    r2dbc:
+      enabled: true
+    readinessstate:
+      enabled: true
+  info:
+    git:
+      mode: full
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+
+probe:
+  liveness:
+    initialDelaySeconds: 120
+  readiness:
+    initialDelaySeconds: 120
+
+spring:
+  devtools:
+    add-properties: true
+  jmx:
+    enabled: true
+  output:
+    ansi:
+      enabled: ALWAYS
+  jackson:
+    serialization:
+      indent-output: true
+
+server:
+  max-http-header-size: 40KB
+  compression:
+    enabled: true
+    min-response-size: 512
+  http2:
+    enabled: true
+  port: 8080
+  tomcat:
+    redirect-context-root: false
+
+trace: false
