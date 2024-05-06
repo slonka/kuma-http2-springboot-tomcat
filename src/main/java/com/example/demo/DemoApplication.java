@@ -17,8 +17,8 @@ public class DemoApplication {
 
     @GetMapping("/")
     public String hello(@RequestParam(value = "name", defaultValue = "World") String name) {
-      int minSleepMillis = 1000; // 1 second
-      int maxSleepMillis = 5000; // 5 seconds
+      int minSleepMillis = 100; // 1 second
+      int maxSleepMillis = 300; // 5 seconds
 
       int sleepMillis = random.nextInt(maxSleepMillis - minSleepMillis + 1) + minSleepMillis;
       try {
