@@ -32,6 +32,7 @@ kubectl -n kong rollout status deploy/kong-gateway
 # install the app and gateway/mesh routing
 
 kubectl apply -f k8s/spring-app.yaml
+kubectl apply -f k8s/mesh.yaml
 kubectl apply -f k8s/routing.yaml
 kubectl -n kuma-demo rollout status deploy/my-app-deployment
 ```
