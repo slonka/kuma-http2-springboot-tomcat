@@ -11,8 +11,8 @@ logging:
     root: INFO
     org:
       apache:
-        tomcat: DEBUG
-        catalina: DEBUG
+        tomcat: TRACE
+        catalina: TRACE
   config: classpath:logback-spring.xml
 
 management:
