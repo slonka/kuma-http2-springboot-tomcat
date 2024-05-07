@@ -1,0 +1,80 @@
+# enable traffic from Kong Gateway to the application service
+  # dependencies:
+    # 1. Kuma/Kong Mesh installed in your Kubernetes cluster
+    # 2. Kong gateway ingress controller installed in your Kubernetes cluster
+    # 3. mesh mtls is enabled
+  # hightlights:
+    # 1. correct the ports according to the application if needed
+    # 2. if you have Kong Mesh installed instead of Kuma, the TrafficPermission should be installed into the namespace kong-mesh-system
+    # 3. after this manifest is applied, please restart Kong gateway deployoment in the "kong" namespace and wait for their completions
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: kong
+  annotations:
+    konghq.com/gatewayclass-unmanaged: 'true'
+
+spec:
+  controllerName: konghq.com/kic-gateway-controller
+
+---
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: kong
+  namespace: kuma-demo
+spec:
+  gatewayClassName: kong
+  listeners:
+  - name: proxy
+    port: 80
+    protocol: HTTP
+
+---
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: spring-service
+  namespace: kuma-demo
+spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: kong
+    namespace: kuma-demo
+  rules:
+  - backendRefs:
+    - kind: Service
+      name: my-app-spring
+      port: 8080
+      weight: 1
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+
+---
+
+apiVersion: kuma.io/v1alpha1
+kind: MeshTrafficPermission
+metadata:
+  labels:
+    kuma.io/mesh: default
+    kuma.io/origin: zone
+  name: demo-app
+  namespace: kuma-system
+spec:
+  from:
+  - default:
+      action: Allow
+    targetRef:
+      kind: MeshSubset
+      tags:
+        app.kubernetes.io/name: gateway
+        k8s.kuma.io/namespace: kong
+  targetRef:
+    kind: MeshService
+    name: my-app-spring_kuma-demo_svc_8080

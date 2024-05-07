@@ -1,0 +1,25 @@
+# enable mTLS for the default mesh
+  # dependencies:
+    # 1. Kuma/Kong Mesh installed in your Kubernetes cluster
+  # hightlights:
+    # 1. the mtls section in this manifest should be configured
+
+apiVersion: kuma.io/v1alpha1
+kind: Mesh
+metadata:
+  labels:
+    kuma.io/origin: zone
+  name: default
+spec:
+  mtls:
+    backends:
+    - conf:
+        caCert:
+          RSAbits: 2048
+          expiration: 10y
+      dpCert:
+        rotation:
+          expiration: 1d
+      name: ca-1
+      type: builtin
+    enabledBackend: ca-1

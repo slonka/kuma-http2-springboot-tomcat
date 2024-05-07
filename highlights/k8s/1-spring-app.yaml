@@ -1,0 +1,58 @@
+# manifest for deploying the application
+  # dependencies:
+    # 1. the application image, with http2 enabled in application.yaml
+  # hightlights:
+    # 1. enable kuma sidecar injection on the namespace
+    # 2. set appProtocol on Kubernetes service to "http2"
+    # 3. correct the ports according to the application if needed
+
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kuma-demo
+  namespace: kuma-demo
+  labels:
+    kuma.io/sidecar-injection: enabled
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app-spring
+  namespace: kuma-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app-spring
+  template:
+    metadata:
+      labels:
+        app: my-app-spring
+    spec:
+      containers:
+        - name: test-spring-container
+          image: spring-http2-test:1.0.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: spring.output.ansi.enabled
+              value: never
+            - name: JDK_JAVA_OPTIONS
+              value: '-XX:InitialRAMPercentage=80.0 -XX:MinRAMPercentage=80.0 -XX:MaxRAMPercentage=80.0 -XshowSettings:vm -Djdk.http.auth.tunneling.disabledSchemes=""'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-spring
+  namespace: kuma-demo
+spec:
+  selector:
+    app: my-app-spring
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      appProtocol: http2
+  type: ClusterIP
